@@ -306,7 +306,7 @@ int main(int argc, char *argv[]){
    /* ------------------------------------------------------------------------------------------------------ */
 
    /* Option -gapthreshold.end ----------------------------------------------------------------------------- */
-    else if((!strcmp(argv[i], "-gapthreshold.end") && (i+1 != argc) && (gapThreshold_end == -1)) {
+    else if((!strcmp(argv[i], "-gapthreshold.end")) && (i+1 != argc) && (gapThreshold_end == -1)) {
 
       if((selectCols) || (selectSeqs) || (gapThreshold != -1)) {
         cerr << endl << "ERROR: Not allowed in combination of other manual methods such as manual selection of sequences/columns or gapthreshold." << endl << endl;
@@ -364,7 +364,7 @@ int main(int argc, char *argv[]){
    /* ------------------------------------------------------------------------------------------------------ */
 
    /* Option -simthreshold.end ----------------------------------------------------------------------------- */
-    else if((!strcmp(argv[i], "-simthreshold.end") && (i+1 != argc) && (simThreshold_end == -1)) {
+    else if((!strcmp(argv[i], "-simthreshold.end")) && (i+1 != argc) && (simThreshold_end == -1)) {
 
       if((selectCols) || (selectSeqs) || (simThreshold != -1)) {
         cerr << endl << "ERROR: Not allowed in combination of other manual methods such as manual selection of sequences/columns or simthreshold." << endl << endl;
@@ -429,7 +429,7 @@ int main(int argc, char *argv[]){
    /* ------------------------------------------------------------------------------------------------------ */
 
    /* Option -conthreshold.end ----------------------------------------------------------------------------- */
-   else if((!strcmp(argv[i], "-conthreshold.end") && (i+1 != argc) && (comThreshold_end == -1)) {
+   else if((!strcmp(argv[i], "-conthreshold.end")) && (i+1 != argc) && (comThreshold_end == -1)) {
 
      if((selectCols) || (selectSeqs) || (comThreshold != -1)) {
        cerr << endl << "ERROR: Not allowed in combination of other manual methods such as manual selection of sequences/columns or conthreshold." << endl << endl;
@@ -450,7 +450,7 @@ int main(int argc, char *argv[]){
      else {
        if(utils::isNumber(argv[++i])) {
          comThreshold_end = atof(argv[i]);
-         if((comThreshold_end < 0) || (comThreshold_end 1)) {
+         if((comThreshold_end < 0) || (comThreshold_end > 1)) {
            cerr << endl << "ERROR: The conthreshold.end value should be between 0 and 1." << endl << endl;
            appearErrors = true;
          }
