@@ -47,8 +47,8 @@ int main(int argc, char *argv[]){
        strict = false, strictplus = false, automated1 = false, sgc = false, sgt = false, scc = false, sct = false, sfc = false,
        sft = false, sident = false, selectSeqs = false, selectCols = false, shortNames = false, splitbystop = false, terminal = false,
        keepSeqs = false, keepHeader = false, ignorestop = false;
-
-  float conserve = -1, gapThreshold = -1, simThreshold = -1, comThreshold = -1, resOverlap = -1, seqOverlap = -1, maxIdentity = -1;
+  float conserve = -1, gapThreshold = -1, simThreshold = -1, comThreshold = -1, resOverlap = -1, seqOverlap = -1, maxIdentity = -1, 
+      gapThreshold_end = -1, simThreshold_end = -1, comThreshold_end = -1;;
   int outformat = -1, prevType = -1, compareset = -1, stats = 0, windowSize = -1, gapWindow = -1, simWindow = -1, conWindow = -1,
       blockSize = -1, clusters = -1;
 
@@ -279,8 +279,8 @@ int main(int argc, char *argv[]){
    /* Option -gt, gapthreshold ----------------------------------------------------------------------------- */
     else if((!strcmp(argv[i], "-gapthreshold") || !strcmp(argv[i], "-gt")) && (i+1 != argc) && (gapThreshold == -1)) {
 
-      if((selectCols) || (selectSeqs)) {
-        cerr << endl << "ERROR: Not allowed in combination of other manual methods such as manual selection of sequences/columns." << endl << endl;
+      if((selectCols) || (selectSeqs) || (gapThreshold_end != -1)) {
+        cerr << endl << "ERROR: Not allowed in combination of other manual methods such as manual selection of sequences/columns or gapthreshold.end." << endl << endl;
         appearErrors = true;
       }
 
@@ -305,11 +305,40 @@ int main(int argc, char *argv[]){
     }
    /* ------------------------------------------------------------------------------------------------------ */
 
+   /* Option -gapthreshold.end ----------------------------------------------------------------------------- */
+    else if((!strcmp(argv[i], "-gapthreshold.end") && (i+1 != argc) && (gapThreshold_end == -1)) {
+
+      if((selectCols) || (selectSeqs) || (gapThreshold != -1)) {
+        cerr << endl << "ERROR: Not allowed in combination of other manual methods such as manual selection of sequences/columns or gapthreshold." << endl << endl;
+        appearErrors = true;
+      }
+
+      else if((nogaps) || (noallgaps) || (gappyout) || (strict) || (strictplus) || (automated1)) {
+        cerr << endl << "ERROR: Combinations between automatic and manual methods are not allowed" << endl << endl;
+        appearErrors = true;
+      }
+
+      else {
+        if(utils::isNumber(argv[++i])) {
+          gapThreshold_end = 1 - atof(argv[i]);
+          if((gapThreshold_end < 0) || (gapThreshold_end > 1)) {
+            cerr << endl << "ERROR: The gapThreshold.end value should be between 0 and 1." << endl << endl;
+            appearErrors = true;
+          }
+        }
+        else {
+          cerr << endl << "ERROR: The gapThreshold.end value should be a positive real number." << endl << endl;
+          appearErrors = true;
+        }
+      }
+    }
+   /* ------------------------------------------------------------------------------------------------------ */
+
    /* Option -st -simthreshold ----------------------------------------------------------------------------- */
     else if((!strcmp(argv[i], "-simthreshold") || !strcmp(argv[i], "-st")) && (i+1 != argc) && (simThreshold == -1)) {
 
-      if((selectCols) || (selectSeqs)) {
-        cerr << endl << "ERROR: Not allowed in combination of other manual methods such as manual selection of sequences/columns." << endl << endl;
+      if((selectCols) || (selectSeqs) || (simThreshold_end != -1)) {
+        cerr << endl << "ERROR: Not allowed in combination of other manual methods such as manual selection of sequences/columns or simthreshold.end." << endl << endl;
         appearErrors = true;
       }
 
@@ -334,12 +363,40 @@ int main(int argc, char *argv[]){
     }
    /* ------------------------------------------------------------------------------------------------------ */
 
+   /* Option -simthreshold.end ----------------------------------------------------------------------------- */
+    else if((!strcmp(argv[i], "-simthreshold.end") && (i+1 != argc) && (simThreshold_end == -1)) {
+
+      if((selectCols) || (selectSeqs) || (simThreshold != -1)) {
+        cerr << endl << "ERROR: Not allowed in combination of other manual methods such as manual selection of sequences/columns or simthreshold." << endl << endl;
+        appearErrors = true;
+      }
+
+      else if((nogaps) || (noallgaps) || (gappyout) || (strict) || (strictplus) || (automated1)) {
+        cerr << endl << "ERROR: Combinations between automatic and manual methods are not allowed" << endl << endl;
+        appearErrors = true;
+      }
+
+      else {
+        if(utils::isNumber(argv[++i])) {
+          simThreshold_end = 1 - atof(argv[i]);
+          if((simThreshold_end < 0) || (simThreshold_end > 1)) {
+            cerr << endl << "ERROR: The simThreshold.end value should be between 0 and 1." << endl << endl;
+            appearErrors = true;
+          }
+        }
+        else {
+          cerr << endl << "ERROR: The simThreshold.end value should be a positive real number." << endl << endl;
+          appearErrors = true;
+        }
+      }
+    }
+   /* ------------------------------------------------------------------------------------------------------ */
 
    /* Option -ct -conthreshold ----------------------------------------------------------------------------- */
     else if((!strcmp(argv[i], "-conthreshold") || !strcmp(argv[i], "-ct")) && (i+1 != argc) && (comThreshold == -1)) {
 
-      if((selectCols) || (selectSeqs)) {
-        cerr << endl << "ERROR: Not allowed in combination of other manual methods such as manual selection of sequences/columns." << endl << endl;
+      if((selectCols) || (selectSeqs) || (comThreshold_end != -1)) {
+        cerr << endl << "ERROR: Not allowed in combination of other manual methods such as manual selection of sequences/columns or conthreshold.end." << endl << endl;
         appearErrors = true;
       }
 
@@ -369,6 +426,41 @@ int main(int argc, char *argv[]){
       }
     }
 
+   /* ------------------------------------------------------------------------------------------------------ */
+
+   /* Option -conthreshold.end ----------------------------------------------------------------------------- */
+   else if((!strcmp(argv[i], "-conthreshold.end") && (i+1 != argc) && (comThreshold_end == -1)) {
+
+     if((selectCols) || (selectSeqs) || (comThreshold != -1)) {
+       cerr << endl << "ERROR: Not allowed in combination of other manual methods such as manual selection of sequences/columns or conthreshold." << endl << endl;
+       appearErrors = true;
+     }
+
+     //~ else if((nogaps) || (noallgaps) || (gappyout) || (strict) || (strictplus) || (automated1)) {
+       //~ cerr << endl << "ERROR: Combinations between automatic and manual methods are not allowed" << endl << endl;
+       //~ appearErrors = true;
+     //~ }
+
+     else if(infile != NULL) {
+       cerr << endl << "ERROR: Not allowed in combination with -in option." << endl << endl;
+       appearErrors = true;
+
+     }
+
+     else {
+       if(utils::isNumber(argv[++i])) {
+         comThreshold_end = atof(argv[i]);
+         if((comThreshold_end < 0) || (comThreshold_end 1)) {
+           cerr << endl << "ERROR: The conthreshold.end value should be between 0 and 1." << endl << endl;
+           appearErrors = true;
+         }
+       }
+       else {
+         cerr << endl << "ERROR: The conthreshold.end value should be a positive real number." << endl << endl;
+         appearErrors = true;
+       }
+     }
+   }
    /* ------------------------------------------------------------------------------------------------------ */
 
    /* Option -cons ----------------------------------------------------------------------------------------- */
@@ -1772,8 +1864,18 @@ void menu(void) {
   cout << "    -selectseqs { n,l,m-k }  " << "Selection of sequences to be removed from the alignment. Range: [0 - (Number of Sequences - 1)]. (see User Guide)." << endl << endl;
 
   cout << "    -gt -gapthreshold <n>    " << "1 - (fraction of sequences with a gap allowed). Range: [0 - 1]" << endl;
+
+  cout << "    -gapthreshold.end <n>    " << "Set the gap threshold value (1 - fraction of sequences with a gap allowed) used to stop"
+                                          << " the trimming of columns from the beginning/end of the input alignment. Range: [0 - 1]." << endl;
+
   cout << "    -st -simthreshold <n>    " << "Minimum average similarity allowed. Range: [0 - 1]" << endl;
+
+  cout << "    -simthreshold.end <n>    " << "Set the similarity value used to stop the trimming of columns from the beginning/end of the input alignment. Range: [0 - 1]." << endl;
+
   cout << "    -ct -conthreshold <n>    " << "Minimum consistency value allowed.Range: [0 - 1]" << endl;
+
+  cout << "    -conthreshold.end <n>    " << "Set the consistency value used to stop the trimming of columns from the beginning/end of the input alignment. Range: [0 - 1]." << endl;
+
   cout << "    -cons <n>                " << "Minimum percentage of the positions in the original alignment to conserve. Range: [0 - 100]" << endl << endl;
 
   cout << "    -nogaps                  " << "Remove all positions with gaps in the alignment." << endl;
@@ -1875,4 +1977,3 @@ void examples(void) {
 
   cout << "   trimal -in <inputfile> -out <outputfile> -clusters 5 " << endl << endl;
 }
-
