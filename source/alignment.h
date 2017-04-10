@@ -132,9 +132,15 @@ class alignment {
 
   alignment *cleanByCutValue(double, float, const int *, bool);
 
+  alignment *cleanByCutValueEnd(double, float, const int *, bool);
+
   alignment *cleanByCutValue(float, float, const float *, bool);
 
+  alignment *cleanByCutValueEnd(float, float, const float *, bool);
+
   alignment *cleanByCutValue(double, const int *, float, float, const float *, bool);
+
+  alignment *cleanByCutValueEnd(double, const int *, float, float, const float *, bool);
 
   alignment *cleanStrict(int, const int *, float, const float *, bool, bool);
 
@@ -201,6 +207,23 @@ class alignment {
   /* ****************************************************************************************************************** */
   /* ****************************************************************************************************************** */
 
+
+  /** \brief Alignment trimming using gap method.
+   * \param baseLine base line, security, percentage of colums in the alignment.
+   * \param threshold maximum percentage of gaps permitted per column.
+   * \return the clean alignment if all is ok, \e NULL if there were errors
+   *
+   * Method that cleans the alignment using gap method, and generates a new,
+   * clean alignment.
+   */
+
+  /* ****************************************************************************************************************** */
+  /* ********************************************************************************************************************/
+  alignment *cleanGapsEnd(float, float, bool);
+  /* ****************************************************************************************************************** */
+  /* ****************************************************************************************************************** */
+
+
   /** \brief Alignment trimming using conservation method.
    * \param baseLine base line, security, percentage of colums in the alignment.
    * \return the clean alignment if all is ok, \e NULL if there were errors
@@ -212,6 +235,21 @@ class alignment {
   /* *************************************************************************************************************** */
   /* *************************************************************************************************************** */
   alignment *cleanConservation(float, float, bool);
+  /* *************************************************************************************************************** */
+  /* *************************************************************************************************************** */
+
+
+  /** \brief Alignment trimming using conservation method.
+   * \param baseLine base line, security, percentage of colums in the alignment.
+   * \return the clean alignment if all is ok, \e NULL if there were errors
+   *
+   * Method that cleans the alignment using conservation method, and generates a new,
+   * clean alignment.
+   */
+
+  /* *************************************************************************************************************** */
+  /* *************************************************************************************************************** */
+  alignment *cleanConservationEnd(float, float, bool);
   /* *************************************************************************************************************** */
   /* *************************************************************************************************************** */
 
@@ -244,6 +282,22 @@ class alignment {
   /* *************************************************************************************************************** */
   /* *************************************************************************************************************** */
 
+  /** \brief Alignment trimming using gap method and conservation method.
+   * \param baseLine base line, security, percentage of colums in the alignment.
+   * \param threshold maximum percentage of gaps permitted per column.
+   * \param conservationPct minimum conservatoin percentage permitted in the clean alignment.
+   * \return the clean alignment if all is ok, \e NULL if there were errors.
+   *
+   * Method that cleans the alignment using both gaps method and conservation method, and
+   * generates a new, clean alignment.
+   */
+
+  /* *************************************************************************************************************** */
+  /* *************************************************************************************************************** */
+  alignment *cleanEnd(float, float, float, bool);
+  /* *************************************************************************************************************** */
+  /* *************************************************************************************************************** */
+
 
   /** \brief Alignment trimming using a vector of comparison values.
    * \param threshold minimal comparison value permitted per column.
@@ -257,6 +311,22 @@ class alignment {
   /* *************************************************************************************************************** */
   /* *************************************************************************************************************** */
   alignment *cleanCompareFile(float, float, float *, bool);
+  /* *************************************************************************************************************** */
+  /* *************************************************************************************************************** */
+
+
+  /** \brief Alignment trimming using a vector of comparison values.
+   * \param threshold minimal comparison value permitted per column.
+   * \param vectValue comparison values vector from the alignment to clean.
+   * \return the clean alignment if all is ok, \e NULL if there were errors
+   *
+   * Method that cleans the alignment using vector of comparison values, and generates
+   *  a new clean alignment.
+   */
+
+  /* *************************************************************************************************************** */
+  /* *************************************************************************************************************** */
+  alignment *cleanCompareFileEnd(float, float, float *, bool);
   /* *************************************************************************************************************** */
   /* *************************************************************************************************************** */
 

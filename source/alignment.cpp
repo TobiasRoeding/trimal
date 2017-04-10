@@ -675,6 +675,50 @@ alignment *alignment::cleanGaps(float baseLine, float gapsPct, bool complementar
 }
 
 /* ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** */
+/* This function trimms a given alignment based on the gap distribution
+ * values. To trim the alignment, this function uses two parameters:
+ *
+ *      baseLine:   Minimum percentage of columns that should
+ *                  be conserved in the new alignment.
+ *      gapsPct:    Maximum percentage of gaps per column that
+ *                  should be in the new alignment.
+ *
+ * The function selects that combination of parameters that maximize the
+ * final number of columns in the new alignment. There is an extra parameter
+ * to ask for the complementary alignment. A complementary alignment consits
+ * of those columns that would delete applying the standard approach. */
+/* ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** */
+alignment *alignment::cleanGapsEnd(float baseLine, float gapsPct, bool complementary) {
+
+  alignment *ret;
+  double cut;
+
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+  /* If gaps statistics are not calculated, we
+   * calculate them */
+  if(calculateGapStats() != true)
+    return NULL;
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+  /* Obtain the cut point using the given parameters */
+  cut = sgaps -> calcCutPoint(baseLine, gapsPct);
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+  /* Once we have the cut value proposed, we call the
+   * appropiate method to clean the alignment and, then,
+   * generate the new alignment. */
+  ret = cleanByCutValueEnd(cut, baseLine, sgaps -> getGapsWindow(), complementary);
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+  /* Return a reference of the new alignment */
+  return ret;
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+}
+
+/* ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** */
 /* This function trimms a given alignment based on the similarity distribution
  * values. To trim the alignment, this function uses two parameters:
  *
@@ -710,6 +754,50 @@ alignment *alignment::cleanConservation(float baseLine, float conservationPct, b
    * method to clean the alignment and, then, generate
      the new alignment */
   ret = cleanByCutValue(cut, baseLine, scons -> getMdkwVector(), complementary);
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+  /* Return a reference of the new alignment */
+  return ret;
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+}
+
+/* ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** */
+/* This function trimms a given alignment based on the similarity distribution
+ * values. To trim the alignment, this function uses two parameters:
+ *
+ *      baseLine:   Minimum percentage of columns that should
+ *                  be conserved in the new alignment.
+ *      conservat:  Minimum value of similarity per column that
+ *                  should be in the new alignment.
+ *
+ * The function selects that combination of parameters that maximize the
+ * final number of columns in the new alignment. There is an extra parameter
+ * to ask for the complementary alignment. A complementary alignment consits
+ * of those columns that would delete applying the standard approach. */
+/* ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** */
+alignment *alignment::cleanConservationEnd(float baseLine, float conservationPct, bool complementary) {
+
+  alignment *ret;
+  float cut;
+
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+  /* If conservation's statistics are not calculated,
+   * we calculate them */
+  if(calculateConservationStats() != true)
+    return NULL;
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+  /* Calculate the cut point using the given parameters */
+  cut = scons -> calcCutPoint(baseLine, conservationPct);
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+  /* Once we have the cut value, we call the appropiate
+   * method to clean the alignment and, then, generate
+     the new alignment */
+  ret = cleanByCutValueEnd(cut, baseLine, scons -> getMdkwVector(), complementary);
   /* ***** ***** ***** ***** ***** ***** ***** ***** */
 
   /* ***** ***** ***** ***** ***** ***** ***** ***** */
@@ -777,6 +865,64 @@ alignment *alignment::clean(float baseLine, float GapsPct, float conservationPct
 }
 
 /* ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** */
+/* This function trimms a given alignment based on the similarity and gaps
+ * distribution values. To trim the alignment, this function uses three
+ * parameters:
+ *
+ *      baseLine:   Minimum percentage of columns that should
+ *                  be conserved in the new alignment.
+ *      gapsPct:    Maximum percentage of gaps per column that
+ *                  should be in the new alignment.
+ *      conservat:  Minimum value of similarity per column that
+ *                  should be in the new alignment.
+ *
+ * The function selects that combination of parameters that maximize the
+ * final number of columns in the new alignment. If the baseLine parameter
+ * is the most strict, the other two ones would be relaxed to keep columns
+ * that would not be selected. There is an extra parameter to ask for the
+ * complementary alignment. A complementary alignment consits of those
+ * columns that would delete applying the standard approach. */
+/* ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** */
+alignment *alignment::cleanEnd(float baseLine, float GapsPct, float conservationPct, bool complementary) {
+
+  alignment *ret;
+  float cutCons;
+  double cutGaps;
+
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+  /* If gaps statistics are not calculated, we calculate
+   *  them */
+  if(calculateGapStats() != true)
+    return NULL;
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+  /* If conservation's statistics are not calculated,
+   * we calculate them */
+  if(calculateConservationStats() != true)
+    return NULL;
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+  /* Calculate the two cut points using the parameters */
+  cutGaps = sgaps->calcCutPoint(baseLine, GapsPct);
+  cutCons = scons->calcCutPoint(baseLine, conservationPct);
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+  /* Clean the alingment using the two cut values, the
+   * gapsWindow and MDK_Windows vectors and the baseline
+   * value */
+  ret = cleanByCutValueEnd(cutGaps, sgaps -> getGapsWindow(), baseLine, cutCons, scons -> getMdkwVector(), complementary);
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+  /* Return a reference of the clean alignment object */
+  return ret;
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+}
+
+/* ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** */
 /* This function cleans a given alignment based on the consistency values
  * asses from a dataset of alignments. The method takes three parameters:
  *
@@ -822,6 +968,60 @@ alignment *alignment::cleanCompareFile(float cutpoint, float baseLine, float *ve
   /* ***** ***** ***** ***** ***** ***** ***** ***** */
   /* Clean the selected alignment using the input parameters. */
   ret = cleanByCutValue(cut, baseLine, vectValues, complementary);
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+  /* Return a refernce of the new alignment */
+  return ret;
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+}
+
+/* ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** */
+/* This function cleans a given alignment based on the consistency values
+ * asses from a dataset of alignments. The method takes three parameters:
+ *
+ *      cutpoint:   Lower limit (0-1) of comparefile value admits in
+ *                  the new alignment.
+ *      baseline:   Minimum percentage of columns to have in the new alignment
+ *      vectValues: A vector with alignment's consistency values.
+ *
+ * The function computes the optimal parameter combination value to trim
+ * an alignment based on the consistency value from the comparison among
+ * a dataset of alignments with the same sequences. */
+/* ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** */
+alignment *alignment::cleanCompareFileEnd(float cutpoint, float baseLine, float *vectValues, bool complementary) {
+
+  alignment *ret;
+  float cut, *vectAux;
+
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+  /* Allocate memory */
+  vectAux = new float[residNumber];
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+  /* Sort a copy of the vectValues vector, and take the
+   *  value at 100% - baseline position. */
+  utils::copyVect((float *) vectValues, vectAux, residNumber);
+  utils::quicksort(vectAux, 0, residNumber-1);
+  cut = vectAux[(int) ((float)(residNumber - 1) * (100.0 - baseLine)/100.0)];
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+  /* We have to decide which is the smallest value
+   * between the cutpoint value and the value from
+   * the minimum percentage threshold */
+  cut = cutpoint < cut ? cutpoint : cut;
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+  /* Deallocate memory */
+  delete [] vectAux;
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+  /* Clean the selected alignment using the input parameters. */
+  ret = cleanByCutValueEnd(cut, baseLine, vectValues, complementary);
   /* ***** ***** ***** ***** ***** ***** ***** ***** */
 
   /* ***** ***** ***** ***** ***** ***** ***** ***** */
@@ -2173,6 +2373,199 @@ alignment *alignment::cleanByCutValue(double cut, float baseLine,
   return newAlig;
 }
 
+/* This method removes those columns that exceed a given threshold. If the
+ * number of columns in the trimmed alignment is lower than a given percentage
+ * of the original alignment. The program relaxes the threshold until to add
+ * enough columns to achieve this percentage, to add those columns the program
+ * start in the middle of the original alignment and make, alternatively,
+ * movements to the left and right side from that point. This method also can
+ * return the complementary alignment. */
+alignment *alignment::cleanByCutValueEnd(double cut, float baseLine,
+  const int *gInCol, bool complementary) {
+
+  int i, j, k, jn, oth, pos, block, *vectAux;
+  string *matrixAux, *newSeqsName;
+  alignment *newAlig;
+  newValues counter;
+
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+  /* TODO: Description */
+  int position = -1;
+  for(i = 0; i < residNumber; i++){
+    if(gInCol[i] > cut) {
+      position = i; 
+      break;
+    }
+  }
+
+  if(position != -1){
+    for(i = 0; i <= position; i++){
+      saveResidues[i] = -1;
+    }
+  }
+
+  for(i = residNumber -1; i >= 0; i--){
+    if(gInCol[i] > cut) {
+      position = i; 
+      break;
+    }
+  }
+
+  if(position != -1){
+    for(i = residNumber -1; i >= position; i--){
+      saveResidues[i] = -1;
+    }
+  }
+
+  for(i = 0, counter.residues = 0; i < residNumber; i++){
+    if(saveResidues[i] != -1) {
+      counter.residues++;
+    }
+  }
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+  /* Compute, if it's necessary, the number of columns
+   * necessary to achieve the minimum number of columns
+   * fixed by coverage parameter. */
+  oth = utils::roundInt((((baseLine/100.0) - (float) counter.residues/residNumber)) * residNumber);
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+  /* if it's necessary to recover some columns, we
+   * applied this instructions to recover it */
+  if(oth > 0) {
+    counter.residues += oth;
+
+    /* Allocate memory */
+    vectAux = new int[residNumber];
+
+    /* Sort a copy of the gInCol vector, and take the value of the column that marks the % baseline */
+    utils::copyVect((int *) gInCol, vectAux, residNumber);
+    utils::quicksort(vectAux, 0, residNumber-1);
+    cut = vectAux[(int) ((float)(residNumber - 1) * (baseLine)/100.0)];
+
+    /* Deallocate memory */
+    delete [] vectAux;
+  }
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+  /* Fixed the initial size of blocks as 0.5% of
+   * alignment's length */
+  for(k = utils::roundInt(0.005 * residNumber); (k >= 0) && (oth > 0); k--) {
+
+    /* ***** ***** ***** ***** ***** ***** ***** ***** */
+    /* We start in the alignment middle then we move on
+     * right and left side at the same time. */
+    for(i = (residNumber/2), j = (i + 1); (((i > 0) || (j < (residNumber - 1))) && (oth > 0)); i--, j++) {
+
+      /* ***** ***** ***** ***** ***** ***** ***** ***** */
+      /* Left side. Here, we compute the block's size. */
+      for(jn = i; ((saveResidues[jn] != -1) && (jn >= 0) && (oth > 0)); jn--) ;
+
+      /* ***** ***** ***** ***** ***** ***** ***** ***** */
+      /* if block's size is greater or equal than the fixed
+       * size then we save all columns that have not been
+       * saved previously. */
+      if((i - jn) >= k) {
+        for( ; ((saveResidues[jn] == -1) && (jn >= 0) && (oth > 0)); jn--) {
+          if(gInCol[jn] <= cut) {
+            saveResidues[jn] = jn;
+            oth--;
+          } else
+            break;
+        }
+      }
+      i = jn;
+      /* ***** ***** ***** ***** ***** ***** ***** ***** */
+
+      /* ***** ***** ***** ***** ***** ***** ***** ***** */
+      /* Right side. Here, we compute the block's size. */
+      for(jn = j; ((saveResidues[jn] != -1) && (jn < residNumber) && (oth > 0)); jn++) ;
+
+      /* ***** ***** ***** ***** ***** ***** ***** ***** */
+      /* if block's size is greater or equal than the fixed
+       * size then we save all columns that have not been
+       * saved previously. */
+      if((jn - j) >= k) {
+        for( ; ((saveResidues[jn] == -1) && (jn < residNumber) && (oth > 0)); jn++) {
+          if(gInCol[jn] <= cut) {
+            saveResidues[jn] = jn;
+            oth--;
+          } else
+            break;
+        }
+      }
+      j = jn;
+      /* ***** ***** ***** ***** ***** ***** ***** ***** */
+    }
+    /* ***** ***** ***** ***** ***** ***** ***** ***** */
+  }
+
+  /* Keep only columns blocks bigger than an input columns block size */
+  if(blockSize != 0) {
+
+    /* Traverse all alignment looking for columns blocks greater than LONGBLOCK,
+     * everytime than a column is not selected by the trimming method, check
+     * whether the current block size until that point is big enough to be kept
+     * or it should be removed from the final alignment */
+    for(i = 0, pos = 0, block = 0; i < residNumber; i++) {
+      if(saveResidues[i] != -1)
+        block++;
+      else {
+        /* Remove columns from blocks smaller than input blocks size */
+        if(block < blockSize)
+          for(j = pos; j <= i; j++)
+            saveResidues[j] = -1;
+        pos = i + 1;
+        block = 0;
+      }
+    }
+    /* Check final block separately since it could happen than last block is not
+     * big enough but because the loop end could provoke to ignore it */
+    if(block < blockSize)
+      for(j = pos; j < i; j++)
+        saveResidues[j] = -1;
+  }
+
+  /* If the flag -terminalony is set, apply a method to look for internal
+   * boundaries and get back columns inbetween them, if they exist */
+  if(terminalGapOnly == true)
+    if(!removeOnlyTerminal())
+      return NULL;
+
+  /* Once the columns/sequences selection is done, turn it around
+   * if complementary flag is active */
+  if(complementary == true)
+    computeComplementaryAlig(true, false);
+
+  /* Check for any additional column/sequence to be removed */
+  /* Compute new sequences and columns numbers */
+  counter = removeCols_SeqsAllGaps();
+
+  /* Allocate memory  for selected sequences/columns */
+  matrixAux = new string[counter.sequences];
+  newSeqsName = new string[counter.sequences];
+
+  /* Fill local allocated memory with previously selected data */
+  fillNewDataStructure(matrixAux, newSeqsName);
+
+  /* When we have all parameters, we create the new alignment */
+  newAlig = new alignment(filename, aligInfo, matrixAux, newSeqsName, seqsInfo,
+    counter.sequences, counter.residues, iformat, oformat, shortNames, dataType,
+    isAligned, reverse, terminalGapOnly, keepSequences, keepHeader, sequenNumber, residNumber,
+    residuesNumber, saveResidues, saveSequences, ghWindow, shWindow, blockSize,
+    identities);
+
+  /* Deallocate local memory */
+  delete[] matrixAux;
+  delete[] newSeqsName;
+
+  /* Return the new alignment reference */
+  return newAlig;
+}
+
 /* This method removes those columns that not achieve a given threshold. If the
  * number of columns in the trimmed alignment is lower than a given percentage
  * of the original alignment. The program relaxes the threshold until to add
@@ -2194,6 +2587,186 @@ alignment *alignment::cleanByCutValue(float cut, float baseLine,
   for(i = 0, counter.residues = 0; i < residNumber; i++)
     if(ValueVect[i] > cut) counter.residues++;
     else saveResidues[i] = -1;
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+  /* Compute, if it's necessary, the number of columns
+   * necessary to achieve the minimum number of columns
+   * fixed by coverage value. */
+  oth = utils::roundInt((((baseLine/100.0) - (float) counter.residues/residNumber)) * residNumber);
+  if(oth > 0) counter.residues += oth;
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+  /* Fixed the initial size of blocks as 0.5% of
+   * alignment's length */
+  for(k = utils::roundInt(0.005 * residNumber); (k >= 0) && (oth > 0); k--) {
+
+    /* ***** ***** ***** ***** ***** ***** ***** ***** */
+    /* We start in the alignment middle then we move on
+     * right and left side at the same time. */
+    for(i = (residNumber/2), j = (i + 1); (((i > 0) || (j < (residNumber - 1))) && (oth > 0)); i--, j++) {
+
+      /* ***** ***** ***** ***** ***** ***** ***** ***** */
+      /* Left side. Here, we compute the block's size. */
+      for(jn = i; ((saveResidues[jn] != -1) && (jn >= 0) && (oth > 0)); jn--) ;
+
+       /* ***** ***** ***** ***** ***** ***** ***** ***** */
+      /* if block's size is greater or equal than the fixed
+       * size then we save all columns that have not been
+       * saved previously. */
+      /* Here, we only accept column with a conservation's
+       * value equal to conservation cut point. */
+      if((i - jn) >= k) {
+        for( ; ((saveResidues[jn] == -1) && (jn >= 0) && (oth > 0)); jn--) {
+          if(ValueVect[jn] == cut) {
+            saveResidues[jn] = jn;
+            oth--;
+          } else
+            break;
+        }
+      }
+      i = jn;
+      /* ***** ***** ***** ***** ***** ***** ***** ***** */
+
+      /* ***** ***** ***** ***** ***** ***** ***** ***** */
+      /* Right side. Here, we compute the block's size. */
+      for(jn = j; ((saveResidues[jn] != -1) && (jn < residNumber) && (oth > 0)); jn++) ;
+
+      /* ***** ***** ***** ***** ***** ***** ***** ***** */
+      /* if block's size is greater or equal than the fixed
+       * size then we select the column and save the block's
+       * size for the next iteraction. it's obvius that we
+       * decrease the column's number needed to finish. */
+     /* Here, we only accept column with a conservation's
+      * value equal to conservation cut point. */
+      if((jn - j) >= k) {
+        for( ; ((saveResidues[jn] == -1) && (jn < residNumber) && (oth > 0)); jn++) {
+          if(ValueVect[jn] == cut) {
+            saveResidues[jn] = jn;
+            oth--;
+          } else
+            break;
+        }
+      }
+      j = jn;
+      /* ***** ***** ***** ***** ***** ***** ***** ***** */
+    }
+    /* ***** ***** ***** ***** ***** ***** ***** ***** */
+  }
+
+  /* Keep only columns blocks bigger than an input columns block size */
+  if(blockSize != 0) {
+
+    /* Traverse all alignment looking for columns blocks greater than LONGBLOCK,
+     * everytime than a column is not selected by the trimming method, check
+     * whether the current block size until that point is big enough to be kept
+     * or it should be removed from the final alignment */
+    for(i = 0, pos = 0, block = 0; i < residNumber; i++) {
+      if(saveResidues[i] != -1)
+        block++;
+      else {
+        /* Remove columns from blocks smaller than input blocks size */
+        if(block < blockSize)
+          for(j = pos; j <= i; j++)
+            saveResidues[j] = -1;
+        pos = i + 1;
+        block = 0;
+      }
+    }
+    /* Check final block separately since it could happen than last block is not
+     * big enough but because the loop end could provoke to ignore it */
+    if(block < blockSize)
+      for(j = pos; j < i; j++)
+        saveResidues[j] = -1;
+  }
+
+  /* If the flag -terminalony is set, apply a method to look for internal
+   * boundaries and get back columns inbetween them, if they exist */
+  if(terminalGapOnly == true)
+    if(!removeOnlyTerminal())
+      return NULL;
+
+  /* Once the columns/sequences selection is done, turn it around
+   * if complementary flag is active */
+  if(complementary == true)
+    computeComplementaryAlig(true, false);
+
+  /* Check for any additional column/sequence to be removed */
+  /* Compute new sequences and columns numbers */
+  counter = removeCols_SeqsAllGaps();
+
+  /* Allocate memory  for selected sequences/columns */
+  matrixAux = new string[counter.sequences];
+  newSeqsName = new string[counter.sequences];
+
+  /* Fill local allocated memory with previously selected data */
+  fillNewDataStructure(matrixAux, newSeqsName);
+
+  /* When we have all parameters, we create the new alignment */
+  newAlig = new alignment(filename, aligInfo, matrixAux, newSeqsName, seqsInfo,
+    counter.sequences, counter.residues, iformat, oformat, shortNames, dataType,
+    isAligned, reverse, terminalGapOnly, keepSequences, keepHeader, sequenNumber, residNumber,
+    residuesNumber, saveResidues, saveSequences, ghWindow, shWindow, blockSize,
+    identities);
+
+  /* Deallocate local memory */
+  delete[] matrixAux;
+  delete[] newSeqsName;
+
+  /* Return the new alignment reference */
+  return newAlig;
+}
+
+/* This method removes those columns that not achieve a given threshold. If the
+ * number of columns in the trimmed alignment is lower than a given percentage
+ * of the original alignment. The program relaxes the threshold until to add
+ * enough columns to achieve this percentage, to add those columns the program
+ * start in the middle of the original alignment and make, alternatively,
+ * movements to the left and right side from that point. This method also can
+ * return the complementary alignment. */
+alignment *alignment::cleanByCutValueEnd(float cut, float baseLine,
+  const float *ValueVect, bool complementary) {
+
+  int i, j, k, jn, oth, pos, block;
+  string *matrixAux, *newSeqsName;
+  alignment *newAlig;
+  newValues counter;
+
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+  /* TODO: Description */
+  int position = -1;
+  for(i = 0; i < residNumber; i++){
+    if(ValueVect[i] <= cut){
+      position = i; 
+      break;
+    }
+  }
+
+  if(position != -1){
+    for(i = 0; i <= position; i++){
+      saveResidues[i] = -1;
+    }
+  }
+
+  for(i = residNumber -1; i >= 0; i--){
+    if(ValueVect[i] <= cut){
+      position = i; 
+      break;
+    }
+  }
+
+  if(position != -1){
+    for(i = residNumber -1; i >= position; i--){
+      saveResidues[i] = -1;
+    }
+  }
+
+  for(i = 0, counter.residues = 0; i < residNumber; i++){
+    if(saveResidues[i] != -1) {
+      counter.residues++;
+    }
+  }
   /* ***** ***** ***** ***** ***** ***** ***** ***** */
 
   /* ***** ***** ***** ***** ***** ***** ***** ***** */
@@ -2352,6 +2925,226 @@ alignment *alignment::cleanByCutValue(double cutGaps, const int *gInCol,
   for(i = 0, counter.residues = 0; i < residNumber; i++)
     if((MDK_Win[i] > cutCons) && (gInCol[i] <= cutGaps)) counter.residues++;
     else saveResidues[i] = -1;
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+  /* Compute, if it's necessary, the number of columns
+   * necessary to achieve the minimum number of it fixed
+   * by the coverage parameter. */
+  oth = utils::roundInt((((baseLine/100.0) - (float) counter.residues/residNumber)) * residNumber);
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+  /* If it's needed to add new columns, we compute the
+   * news thresholds */
+  if(oth > 0) {
+    counter.residues += oth;
+
+    /* ***** ***** ***** ***** ***** ***** ***** ***** */
+    /* Allocate memory */
+    vectAuxCons = new float[residNumber];
+    vectAuxGaps = new int[residNumber];
+    /* ***** ***** ***** ***** ***** ***** ***** ***** */
+
+    /* ***** ***** ***** ***** ***** ***** ***** ***** */
+    /* Sort a copy of the MDK_Win vector and of the gInCol
+     * vector, and take the value of the column that marks
+     * the % baseline */
+    utils::copyVect((float *) MDK_Win, vectAuxCons, residNumber);
+    utils::copyVect((int *) gInCol, vectAuxGaps, residNumber);
+
+    utils::quicksort(vectAuxCons, 0, residNumber-1);
+    utils::quicksort(vectAuxGaps, 0, residNumber-1);
+
+    blCons = vectAuxCons[(int) ((float)(residNumber - 1) * (100.0 - baseLine)/100.0)];
+    blGaps = vectAuxGaps[(int) ((float)(residNumber - 1) * (baseLine)/100.0)];
+    /* ***** ***** ***** ***** ***** ***** ***** ***** */
+
+    /* ***** ***** ***** ***** ***** ***** ***** ***** */
+    /* Deallocate memory */
+    delete [] vectAuxCons;
+    delete [] vectAuxGaps;
+    /* ***** ***** ***** ***** ***** ***** ***** ***** */
+  }
+
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+  /* Fixed the initial size of blocks as 0.5% of
+   * alignment's length */
+  for(k = utils::roundInt(0.005 * residNumber); (k >= 0) && (oth > 0); k--) {
+
+    /* ***** ***** ***** ***** ***** ***** ***** ***** */
+    /* We start in the alignment middle then we move on
+     * right and left side at the same time. */
+    for(i = (residNumber/2), j = (i + 1); (((i > 0) || (j < (residNumber - 1))) && (oth > 0)); i--, j++) {
+
+      /* ***** ***** ***** ***** ***** ***** ***** ***** */
+      /* Left side. Here, we compute the block's size. */
+      for(jn = i; ((saveResidues[jn] != -1) && (jn >= 0) && (oth > 0)); jn--) ;
+
+      /* ***** ***** ***** ***** ***** ***** ***** ***** */
+      /* if block's size is greater or equal than the fixed
+       * size then we select the column and save the block's
+       * size for the next iteraction. it's obvius that we
+       * decrease the column's number needed to finish. */
+      /* Here, we accept column with a conservation's value
+       * greater or equal than the conservation cut point OR
+       * less or equal than the gap cut point. */
+      if((i - jn) >= k) {
+        for( ; ((saveResidues[jn] == -1) && (jn >= 0) && (oth > 0)); jn--) {
+          if((MDK_Win[jn] >= blCons) || (gInCol[jn] <= blGaps)) {
+            saveResidues[jn] = jn;
+            oth--;
+          } else
+            break;
+        }
+      }
+      i = jn;
+      /* ***** ***** ***** ***** ***** ***** ***** ***** */
+
+      /* ***** ***** ***** ***** ***** ***** ***** ***** */
+      /* Right side. Here, we compute the block's size. */
+      for(jn = j; ((saveResidues[jn] != -1) && (jn < residNumber) && (oth > 0)); jn++) ;
+
+      /* ***** ***** ***** ***** ***** ***** ***** ***** */
+      /* if block's size is greater or equal than the fixed
+       * size then we select the column and save the block's
+       * size for the next iteraction. it's obvius that we
+       * decrease the column's number needed to finish. */
+      /* Here, we accept column with a conservation's value
+       * greater or equal than the conservation cut point OR
+       * less or equal than the gap cut point. */
+      if((jn - j) >= k) {
+        for( ; ((saveResidues[jn] == -1) && (jn < residNumber) && (oth > 0)); jn++) {
+          if((MDK_Win[jn] >= blCons) || (gInCol[jn] <= blGaps)) {
+            saveResidues[jn] = jn;
+            oth--;
+          } else
+            break;
+        }
+      }
+      j = jn;
+      /* ***** ***** ***** ***** ***** ***** ***** ***** */
+    }
+    /* ***** ***** ***** ***** ***** ***** ***** ***** */
+  }
+
+  /* Keep only columns blocks bigger than an input columns block size */
+  if(blockSize != 0) {
+
+    /* Traverse all alignment looking for columns blocks greater than LONGBLOCK,
+     * everytime than a column is not selected by the trimming method, check
+     * whether the current block size until that point is big enough to be kept
+     * or it should be removed from the final alignment */
+    for(i = 0, pos = 0, block = 0; i < residNumber; i++) {
+      if(saveResidues[i] != -1)
+        block++;
+      else {
+        /* Remove columns from blocks smaller than input blocks size */
+        if(block < blockSize)
+          for(j = pos; j <= i; j++)
+            saveResidues[j] = -1;
+        pos = i + 1;
+        block = 0;
+      }
+    }
+    /* Check final block separately since it could happen than last block is not
+     * big enough but because the loop end could provoke to ignore it */
+    if(block < blockSize)
+      for(j = pos; j < i; j++)
+        saveResidues[j] = -1;
+  }
+
+  /* If the flag -terminalony is set, apply a method to look for internal
+   * boundaries and get back columns inbetween them, if they exist */
+  if(terminalGapOnly == true)
+    if(!removeOnlyTerminal())
+      return NULL;
+
+  /* Once the columns/sequences selection is done, turn it around
+   * if complementary flag is active */
+  if(complementary == true)
+    computeComplementaryAlig(true, false);
+
+  /* Check for any additional column/sequence to be removed */
+  /* Compute new sequences and columns numbers */
+  counter = removeCols_SeqsAllGaps();
+
+  /* Allocate memory  for selected sequences/columns */
+  matrixAux = new string[counter.sequences];
+  newSeqsName = new string[counter.sequences];
+
+  /* Fill local allocated memory with previously selected data */
+  fillNewDataStructure(matrixAux, newSeqsName);
+
+  /* When we have all parameters, we create the new alignment */
+  newAlig = new alignment(filename, aligInfo, matrixAux, newSeqsName, seqsInfo,
+    counter.sequences, counter.residues, iformat, oformat, shortNames, dataType,
+    isAligned, reverse, terminalGapOnly, keepSequences, keepHeader, sequenNumber, residNumber,
+    residuesNumber, saveResidues, saveSequences, ghWindow, shWindow, blockSize,
+    identities);
+
+  /* Deallocate local memory */
+  delete[] matrixAux;
+  delete[] newSeqsName;
+
+  /* Return the new alignment reference */
+  return newAlig;
+}
+
+/* This method removes those columns that not achieve the similarity threshond,
+ * by one hand, and exceed the gaps threshold. If the number of columns that
+ * have been selected is lower that a given coverage, the program relaxes both
+ * thresholds in order to get back some columns and achieve this minimum
+ * number of columns in the new alignment. For that purpose, the program
+ * starts at the middle of the original alignment and makes, alternatively,
+ * movememts to the right and left sides looking for those columns necessary
+ * to achieve the minimum number of columns set by the coverage parameter.
+ * This method also can return the complementary alignmnet consists of those
+ * columns that will be deleted from the original alignment applying the
+ * standard method. */
+alignment *alignment::cleanByCutValueEnd(double cutGaps, const int *gInCol,
+  float baseLine, float cutCons, const float *MDK_Win, bool complementary) {
+
+  int i, j, k, oth, pos, block, jn, blGaps, *vectAuxGaps;
+  string *matrixAux, *newSeqsName;
+  float blCons, *vectAuxCons;
+  alignment *newAlig;
+  newValues counter;
+
+  /* ***** ***** ***** ***** ***** ***** ***** ***** */
+  /* TODO: Description */
+  int position = -1;
+  for(i = 0; i < residNumber; i++){
+    if((MDK_Win[i] <= cutCons) && (gInCol[i] > cutGaps)){
+      position = i; 
+      break;
+    }
+  }
+
+  if(position != -1){
+    for(i = 0; i <= position; i++){
+      saveResidues[i] = -1;
+    }
+  }
+
+  for(i = residNumber -1; i >= 0; i--){
+     if((MDK_Win[i] <= cutCons) && (gInCol[i] > cutGaps)){
+      position = i; 
+      break;
+    }
+  }
+
+  if(position != -1){
+    for(i = residNumber -1; i >= position; i--){
+      saveResidues[i] = -1;
+    }
+  }
+
+  for(i = 0, counter.residues = 0; i < residNumber; i++){
+    if(saveResidues[i] != -1) {
+      counter.residues++;
+    }
+  }
   /* ***** ***** ***** ***** ***** ***** ***** ***** */
 
   /* ***** ***** ***** ***** ***** ***** ***** ***** */

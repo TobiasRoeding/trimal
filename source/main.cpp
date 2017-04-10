@@ -1289,7 +1289,8 @@ int main(int argc, char *argv[]){
   /* ------------------------------------------------------------------------------------------------------ */
   if((colnumbering) && (!appearErrors)) {
     if((!nogaps) && (!noallgaps) && (!gappyout) && (!strict) && (!strictplus) && (!automated1)
-      && (gapThreshold == -1) && (conserve == -1) && (simThreshold == -1) &&  (comThreshold == -1) && (!selectCols) && (!selectSeqs)) {
+      && (gapThreshold == -1) && (conserve == -1) && (simThreshold == -1) &&  (comThreshold == -1) && 
+      (gapThreshold_end == -1) && (simThreshold_end == -1) && (comThreshold_end == -1) && (!selectCols) && (!selectSeqs)) {
       cerr << endl << "ERROR: This parameter can only be used with any trimming method." << endl << endl;
       appearErrors = true;
     }
@@ -1313,6 +1314,7 @@ int main(int argc, char *argv[]){
   if((outhtml != NULL) && (!appearErrors)) {
    if((!nogaps) && (!noallgaps) && (!gappyout) && (!strict) && (!strictplus) && (!automated1) &&
       (gapThreshold == -1) && (conserve == -1) && (simThreshold == -1) && (comThreshold == -1) &&
+      (gapThreshold_end == -1) && (simThreshold_end == -1) && (comThreshold_end == -1) && 
       (!selectCols) && (!selectSeqs) && (resOverlap == -1) && (seqOverlap == -1) && (maxIdentity == -1) &&
     (clusters == -1)) {
       cerr << endl << "ERROR: This parameter can only be used with any trimming method." << endl << endl;
@@ -1666,6 +1668,11 @@ int main(int argc, char *argv[]){
     singleAlig = origAlig -> cleanCompareFile(comThreshold, conserve, compareVect, complementary);
  /* -------------------------------------------------------------------- */
 
+ /* -------------------------------------------------------------------- */
+  if(comThreshold_end != -1)
+    singleAlig = origAlig -> cleanCompareFileEnd(comThreshold_end, conserve, compareVect, complementary);
+ /* -------------------------------------------------------------------- */
+
   /* -------------------------------------------------------------------- */
   if((resOverlap != -1) && (seqOverlap != -1)) {
     singleAlig = origAlig -> cleanSpuriousSeq(resOverlap, (seqOverlap/100), complementary);
@@ -1683,9 +1690,25 @@ int main(int argc, char *argv[]){
   /* -------------------------------------------------------------------- */
 
   /* -------------------------------------------------------------------- */
+  if(simThreshold_end != -1.0) {
+    if(gapThreshold_end != -1.0)
+      singleAlig = origAlig -> cleanEnd(conserve, gapThreshold_end, simThreshold_end, complementary);
+    else
+      singleAlig = origAlig -> cleanConservationEnd(conserve, simThreshold_end, complementary);
+  }
+  /* -------------------------------------------------------------------- */
+
+
+  /* -------------------------------------------------------------------- */
   else if(gapThreshold != -1.0)
     singleAlig = origAlig -> cleanGaps(conserve, gapThreshold, complementary);
   /* -------------------------------------------------------------------- */
+
+  /* -------------------------------------------------------------------- */
+  else if(gapThreshold_end != -1.0)
+    singleAlig = origAlig -> cleanGapsEnd(conserve, gapThreshold_end, complementary);
+  /* -------------------------------------------------------------------- */
+
 
   /* -------------------------------------------------------------------- */
   if((selectCols) || (selectSeqs)) {
