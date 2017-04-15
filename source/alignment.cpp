@@ -2391,33 +2391,39 @@ alignment *alignment::cleanByCutValueEnd(double cut, float baseLine,
   /* ***** ***** ***** ***** ***** ***** ***** ***** */
   /* TODO: Description */
   int position = -1;
-  for(i = 0; i < residNumber; i++){
-    if(gInCol[i] > cut) {
-      position = i; 
+  for(i = 0; i < residNumber; i++) {
+    if(gInCol[i] < cut) {
+      //counter.residues++;
+      position = i;
       break;
     }
   }
 
-  if(position != -1){
-    for(i = 0; i <= position; i++){
+  position = position - 1;
+
+  if(position != -1) {
+    for(i = 0; i <= position; i++) {
       saveResidues[i] = -1;
     }
   }
 
-  for(i = residNumber -1; i >= 0; i--){
-    if(gInCol[i] > cut) {
-      position = i; 
+  for(i = residNumber - 1; i >= 0; i--) {
+    if(gInCol[i] < cut) {
+      //counter.residues++;
+      position = i;
       break;
     }
   }
 
-  if(position != -1){
-    for(i = residNumber -1; i >= position; i--){
+  position = position + 1;
+
+  if(position != -1) {
+    for(i = residNumber -1; i >= position; i--) {
       saveResidues[i] = -1;
     }
   }
 
-  for(i = 0, counter.residues = 0; i < residNumber; i++){
+  for(i = 0, counter.residues = 0; i < residNumber; i++) {
     if(saveResidues[i] != -1) {
       counter.residues++;
     }
@@ -2736,33 +2742,39 @@ alignment *alignment::cleanByCutValueEnd(float cut, float baseLine,
   /* ***** ***** ***** ***** ***** ***** ***** ***** */
   /* TODO: Description */
   int position = -1;
-  for(i = 0; i < residNumber; i++){
-    if(ValueVect[i] <= cut){
-      position = i; 
+  for(i = 0; i < residNumber; i++) {
+    if(ValueVect[i] > cut) {
+      //counter.residues++;
+      position = i;
       break;
     }
   }
 
-  if(position != -1){
-    for(i = 0; i <= position; i++){
+  position = position - 1;
+
+  if(position != -1) {
+    for(i = 0; i <= position; i++) {
       saveResidues[i] = -1;
     }
   }
 
-  for(i = residNumber -1; i >= 0; i--){
-    if(ValueVect[i] <= cut){
-      position = i; 
+  for(i = residNumber -1; i >= 0; i--) {
+    if(ValueVect[i] > cut) {
+      //counter.residues++;
+      position = i;
       break;
     }
   }
 
-  if(position != -1){
-    for(i = residNumber -1; i >= position; i--){
+  position = position + 1;
+
+  if(position != -1) {
+    for(i = residNumber -1; i >= position; i--) {
       saveResidues[i] = -1;
     }
   }
 
-  for(i = 0, counter.residues = 0; i < residNumber; i++){
+  for(i = 0, counter.residues = 0; i < residNumber; i++) {
     if(saveResidues[i] != -1) {
       counter.residues++;
     }
@@ -3114,33 +3126,39 @@ alignment *alignment::cleanByCutValueEnd(double cutGaps, const int *gInCol,
   /* ***** ***** ***** ***** ***** ***** ***** ***** */
   /* TODO: Description */
   int position = -1;
-  for(i = 0; i < residNumber; i++){
-    if((MDK_Win[i] <= cutCons) && (gInCol[i] > cutGaps)){
-      position = i; 
+  for(i = 0; i < residNumber; i++) {
+    if((MDK_Win[i] <= cutCons) && (gInCol[i] < cutGaps)) {
+      //counter.residues++;
+      position = i;
       break;
     }
   }
 
-  if(position != -1){
-    for(i = 0; i <= position; i++){
+  position = position - 1;
+
+  if(position != -1) {
+    for(i = 0; i <= position; i++) {
       saveResidues[i] = -1;
     }
   }
 
-  for(i = residNumber -1; i >= 0; i--){
-     if((MDK_Win[i] <= cutCons) && (gInCol[i] > cutGaps)){
-      position = i; 
+  for(i = residNumber -1; i >= 0; i--) {
+    if((MDK_Win[i] <= cutCons) && (gInCol[i] < cutGaps)) {
+      //counter.residues++;
+      position = i;
       break;
     }
   }
 
-  if(position != -1){
-    for(i = residNumber -1; i >= position; i--){
+  position = position + 1;
+
+  if(position != -1) {
+    for(i = residNumber -1; i >= position; i--) {
       saveResidues[i] = -1;
     }
   }
 
-  for(i = 0, counter.residues = 0; i < residNumber; i++){
+  for(i = 0, counter.residues = 0; i < residNumber; i++) {
     if(saveResidues[i] != -1) {
       counter.residues++;
     }
